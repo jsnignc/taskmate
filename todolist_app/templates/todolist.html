@@ -1,0 +1,83 @@
+{% extends 'base.html' %}
+{% block title %}
+    <title>Welcome To Todo List Page</title>
+{% endblock title %}
+{% block content %}
+    <div class="container" style="padding-top: 20px;">
+        <br>
+        {% if  messages %}
+            {% for message in messages %}
+                <div class="alert alert-primary alert-dismissible fade show" role="alert">
+                    {{ message }}
+                    <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+            {% endfor %}
+        {% endif %}
+        <form method="POST">
+            <div class="input-group mb-3 container-md">
+            {% csrf_token %}
+                <input type="text" class="form-control" name="task" placeholder="New Task?">
+                <div class="input-group-append">
+                    <button class="btn btn-primary" type="submit">Add Task</button>
+                </div>
+            </div>
+        </form>
+        <br>
+        <table class="table table-bordered">
+            <thead class="thead-dark">
+                <tr>
+                <th scope="col">Task</th>
+                <th scope="col">Done</th>
+                <th scope="col">Edit</th>
+                <th scope="col">Delete</th>
+                </tr>
+            </thead>
+            <tbody>
+            {% if all_tasks %}
+                {% for obj in all_tasks %}
+                    {% if obj.done %}
+                        <tr class="table-warning">
+                        <td>{{ obj.task }}</td>
+                        <td><a href="{% url 'pending_task' obj.id %}"><button type="button" class="btn btn-primary btn-sm">Completed</button></a></td>
+                        <td><a href="{% url 'edit_task' obj.id %}"><button type="button" class="btn btn-outline-secondary btn-sm">Edit</button></a></td>
+                        <td><a href="{% url 'delete_task' obj.id %}"><button type="button" class="btn btn-outline-danger btn-sm">Delete</button></a></td>
+                        </tr>
+                    {% else %}
+                        <tr>
+                        <td>{{ obj.task }}</td>
+                        <td><a href="{% url 'completed_task' obj.id %}"><button type="button" class="btn btn-secondary btn-sm">Pending</button></a></td>
+                        <td><a href="{% url 'edit_task' obj.id %}"><button type="button" class="btn btn-outline-secondary btn-sm">Edit</button></a></td>
+                        <td><a href="{% url 'delete_task' obj.id %}"><button type="button" class="btn btn-outline-danger btn-sm">Delete</button></a></td>
+                        </tr>
+                    {% endif %}
+                {% endfor %}
+            {% endif %}
+            </tbody>
+        </table>
+        <nav aria-label="Page navigation example">
+            {% if  all_tasks.has_other_pages %}
+                <ul class="pagination justify-content-end">
+                    {% if  all_tasks.has_previous %}
+                        <li class="page-item"><a class="page-link" href="?pg=1">&laquo;</a></li>
+                    {% else %}
+                        <li class="page-item disabled"><a class="page-link">&laquo;</a></li>
+                    {% endif %}
+                    {% if all_tasks.has_previous %}
+                        <li class="page-item"><a class="page-link" href="?pg={{ all_tasks.previous_page_number }}">{{ all_tasks.previous_page_number }}</a></li>
+                    {% endif %}
+                    <li class="page-item"><a class="page-link" href="?pg={{ all_tasks.number }}">{{ all_tasks.number }}</a></li>
+                    {% if all_tasks.has_next %}
+                        <li class="page-item"><a class="page-link" href="?pg={{ all_tasks.next_page_number }}">{{ all_tasks.next_page_number }}</a></li>
+                    {% endif %}
+                    {% if all_tasks.has_next %}
+                        <li class="page-item"><a class="page-link" href="?pg={{ all_tasks.paginator.num_pages }}">&raquo;</a></li>
+                    {% else %}
+                        <li class="page-item disabled"><a class="page-link">&raquo;</a></li>
+                    {% endif %}
+                </ul>
+            {% endif %}
+        </nav>
+    </div>
+{% endblock content %}
